@@ -4,4 +4,7 @@
     <preferredVcsName>ApexVCS</preferredVcsName>
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.6.2 (~/miniconda3/envs/dl3/bin/python)" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="2" />
+  </component>
 </project>

@@ -1,8 +1,9 @@
+from __future__ import print_function
+
 import torch
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-
 
 class Net(nn.Module):
     def __init__(self, config):
@@ -28,28 +29,29 @@ class Net(nn.Module):
         self.self_cores = {}
         for i in range(3):
             self.self_cores[i] = []
-            self.self_cores[i].append(nn.Linear(64, 64))
-            self.self_cores[i].append(nn.Linear(64, 64))
+            self.self_cores[i].append(nn.Linear(64, 64).double().cuda())
+            self.self_cores[i].append(nn.Linear(64, 64).double().cuda())
         self.rel_cores = {}
         for i in range(3):
             self.rel_cores[i] = []
-            self.rel_cores[i].append(nn.Linear(64 * 2, 64))
-            self.rel_cores[i].append(nn.Linear(64, 64))
-            self.rel_cores[i].append(nn.Linear(64, 64))
+            self.rel_cores[i].append(nn.Linear(64 * 2, 64).double().cuda())
+            self.rel_cores[i].append(nn.Linear(64, 64).double().cuda())
+            self.rel_cores[i].append(nn.Linear(64, 64).double().cuda())
 
         self.affector = {}
         for i in range(3):
             self.affector[i] = []
-            self.affector[i].append(nn.Linear(64, 64))
-            self.affector[i].append(nn.Linear(64, 64))
-            self.affector[i].append(nn.Linear(64, 64))
+            self.affector[i].append(nn.Linear(64, 64).double().cuda())
+            self.affector[i].append(nn.Linear(64, 64).double().cuda())
+            self.affector[i].append(nn.Linear(64, 64).double().cuda())
         self.out = {}
         for i in range(3):
             self.out[i] = []
-            self.out[i].append(nn.Linear(64 + 64, 64))
-            self.out[i].append(nn.Linear(64, 64))
+            self.out[i].append(nn.Linear(64 + 64, 64).double().cuda())
+            self.out[i].append(nn.Linear(64, 64).double().cuda())
         self.aggregator1 = nn.Linear(64 * 3, 64)
         self.aggregator2 = nn.Linear(64, 64)
+        self.state_decoder = nn.Linear(64, 4)
 
     def core(self, s, core_idx):
         objects = torch.chunk(s, 3, 1)
@@ -65,10 +67,10 @@ class Net(nn.Module):
             col_idx = int(i % (2));
             rel_combination.append(torch.cat([objects[row_idx], objects[col_idx]], 1))
         rel_combination = torch.cat(rel_combination)
-
+        rel_combination=rel_combination.view(-1,64*2)
         rel_sd_h1 = F.relu(self.rel_cores[core_idx][0](rel_combination))
         rel_sd_h2 = F.relu(self.rel_cores[core_idx][1](rel_sd_h1) + rel_sd_h1)
-        rel_sd_h3 = self.self_cores[core_idx][2](rel_sd_h2) + rel_sd_h2
+        rel_sd_h3 = self.rel_cores[core_idx][2](rel_sd_h2) + rel_sd_h2
         rel_objects = torch.chunk(rel_sd_h3, 6)
         obj1 = rel_objects[0] + rel_objects[1]
         obj2 = rel_objects[2] + rel_objects[3]
@@ -78,7 +80,7 @@ class Net(nn.Module):
         dynamic_pred = dynamic_pred.view(-1, 64)
         aff1 = F.relu(self.affector[core_idx][0](dynamic_pred))
         aff2 = F.relu(self.affector[core_idx][1](aff1) + aff1)
-        aff3 = self.affector[core_idx][2](aff2) + rel_sd_h2
+        aff3 = self.affector[core_idx][2](aff2) + aff2
         aff3 = aff3.view(-1, 3, 64)
         aff_s = torch.cat([aff3, s], 2)
         aff_s = aff_s.view(-1, 64 + 64)
@@ -90,7 +92,8 @@ class Net(nn.Module):
         return out2
 
     def forward(self, x, x_cor, y_cor):
-        f1, f2, f3, f4, f5, f6 = torch.chunk(x, 6)
+        f1, f2, f3, f4, f5, f6 = torch.chunk(x, 6,1)
+        f1, f2, f3, f4, f5, f6=f1.squeeze(), f2.squeeze(), f3.squeeze(), f4.squeeze(), f5.squeeze(), f6.squeeze()
         f1f2 = torch.cat([f1, f2], 1)
         f2f3 = torch.cat([f2, f3], 1)
         f3f4 = torch.cat([f3, f4], 1)
@@ -127,8 +130,8 @@ class Net(nn.Module):
         diff_pairs = torch.cat([pair1, pair2, pair3, pair4])
         diff_pairs = diff_pairs.view(-1, 64 * 2)
         shared_h1 = F.relu(self.fc2(diff_pairs))
-        shared_h2 = F.relu(self.fc2(shared_h1) + shared_h1)
-        shared_h3 = self.fc2(diff_pairs) + shared_h2
+        shared_h2 = F.relu(self.fc3(shared_h1) + shared_h1)
+        shared_h3 = self.fc4(shared_h2) + shared_h2
         state_codes = shared_h3.view(-1, 3, 64)
         s1, s2, s3, s4 = torch.chunk(state_codes, 4)
         rolls = []
@@ -143,7 +146,24 @@ class Net(nn.Module):
             aggregator2 = aggregator2.view(-1, 3, 64)
             rolls.append(aggregator2)
             s1, s2, s3, s4 = s2, s3, s4, aggregator2
-        return x
+        rollouts=torch.stack(rolls)
+        rollouts=rollouts.view(80,3,64)
+        rollouts=torch.cat([s1,s2,s3,s4,rollouts])
+        rollouts=rollouts.view(-1,64)
+        state_decoder=self.state_decoder(rollouts)
+        state_decoder=state_decoder.view(-1,3,4)
+        aux_out=state_decoder[:4*4]
+        aux_out=aux_out.view(4,4,3,4)
+
+
+
+        net_out=state_decoder[4*4:]
+        net_out=net_out.view(-1,20,3,4)
+        net_out=torch.chunk(net_out, 20,1)
+
+        net_out=net_out[:8]
+        return net_out,aux_out
+
 
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension
