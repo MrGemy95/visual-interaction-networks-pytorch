@@ -159,10 +159,10 @@ class Net(nn.Module):
 
         net_out=state_decoder[4*4:]
         net_out=net_out.view(-1,20,3,4)
-        net_out=torch.chunk(net_out, 20,1)
+        net_out2=torch.chunk(net_out, 20,1)
 
-        net_out=net_out[:8]
-        return net_out,aux_out
+        net_out2=net_out2[:8]
+        return net_out2,aux_out,net_out
 
 
     def num_flat_features(self, x):

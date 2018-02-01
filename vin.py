@@ -1,10 +1,13 @@
 from model import Net
-from train import Trainer
 from config import VinConfig
+import tensorflow as tf
 
 
 def main():
-    net=Net(VinConfig).cuda().double()
+    from  train import Trainer
+    net=Net(VinConfig)
+    net=net.cuda()
+    net=net.double()
     trainer=Trainer(VinConfig,net)
     trainer.train()
 

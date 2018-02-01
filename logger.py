@@ -1,10 +1,9 @@
 # Code referenced from https://gist.github.com/gyglim/1f8dfb1b5c82627ae3efcfbbadb9f514
 
-import tensorflow as tf
 import numpy as np
 import scipy.misc
 import os
-
+import tensorflow as tf
 try:
     from StringIO import StringIO
 except ImportError:
@@ -13,6 +12,8 @@ except ImportError:
 
 class Logger(object):
     def __init__(self, log_dir):
+        import tensorflow as tf
+
         self.summary_writer = tf.summary.FileWriter(log_dir)
         self.summary_ops = {}
 
