@@ -100,23 +100,24 @@ class Trainer():
         test_data = None
         for i, data in enumerate(self.test_dataloader, 0):
             test_data = data
-            break
-        data = test_data[0]
-        inputs, output_label, output_S_label, xy_origin, xy_estimated = data['image'][0], data['output_label'], data[
-            'output_S_label'], data['xy_origin'], data['xy_estimated']
-        xy_origin = Variable(xy_origin).data.cpu().numpy()[0]
-        xy_estimated = Variable(xy_estimated).data.cpu().numpy()[0]
-        inputs, output_label, output_S_label = Variable(inputs).cuda(), Variable(output_label).cuda(), Variable(
-            output_S_label).cuda()
 
-        out, aux_out, posi = self.net(inputs[:4], self.xcor, self.ycor)
-        velo = posi[0][:, :, 2:4];
-        xy_estimated[0] = output_S_label[0][3][3][:, :2].data.cpu().numpy() + (velo[0] * 0.01).data.cpu().numpy()
-        for i in range(1, len([0])):
-            xy_estimated[i] = xy_estimated[i - 1] + velo[i] * 0.01
+            data = test_data[0]
+            inputs, output_label, output_S_label, xy_origin, xy_estimated = data['image'][0], data['output_label'], data[
+                'output_S_label'], data['xy_origin'], data['xy_estimated']
+            xy_origin = Variable(xy_origin).data.cpu().numpy()[0]
+            xy_estimated = Variable(xy_estimated).data.cpu().numpy()[0]
+            inputs, output_label, output_S_label = Variable(inputs).cuda(), Variable(output_label).cuda(), Variable(
+                output_S_label).cuda()
 
-        # Saving
-        print("Image Making")
-        make_image2(xy_origin, self.config.img_folder + "../results/", "true")
-        make_image2(xy_estimated, self.config.img_folder + "../results/", "modeling")
-        print("Done")
+            out, aux_out, posi = self.net(inputs[:4], self.xcor, self.ycor)
+            velo = posi[0][:, :, 2:4];
+            xy_estimated[0] = output_S_label[0][3][3][:, :2].data.cpu().numpy() + (velo[0] * 0.01).data.cpu().numpy()
+            for i in range(1, len([0])):
+                xy_estimated[i] = xy_estimated[i - 1] + velo[i] * 0.01
+
+            # Saving
+            print("Image Making")
+            make_image2(xy_origin, self.config.img_folder + "../results/", "true")
+            make_image2(xy_estimated, self.config.img_folder + "../results/", "modeling")
+            print("Done")
+            yield
