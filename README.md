@@ -11,7 +11,7 @@ An implementation of Deepmind visual interaction networks in Pytorch.
 
 ## Architecture
 <div align="center">
-<img hight="100" width="100" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
+<img hight="800" width="800" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
 </div>
 
 
