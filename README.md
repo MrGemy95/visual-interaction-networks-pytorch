@@ -21,6 +21,9 @@ I used [I@jaesik817](https://github.com/jaesik817/Interaction-networks_tensorflo
 Just run the `physics_engine.py`
 
 
-### Model Output
+### Usage
+- Edit configration file to meet your need.
+- Run `vin.py`
 
 ### References
+* https://github.com/jaesik817/visual-interaction-networks_tensorflow
