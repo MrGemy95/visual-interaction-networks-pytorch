@@ -11,7 +11,7 @@ An implementation of Deepmind visual interaction networks in Pytorch.
 
 ## Architecture
 <div align="center">
-<img align="center" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
+<img hight="100" width="100" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
 </div>
 
 
@@ -21,7 +21,15 @@ I used [I@jaesik817](https://github.com/jaesik817/Interaction-networks_tensorflo
 Just run the `physics_engine.py`
 
 
-### Usage
+## Usage
+### Main Dependencies
+``` 
+Python 3.5
+pytorch 0.3
+numpy 1.13.1
+```
+
+### RUN
 - Edit configration file to meet your need.
 - Run `vin.py`
 
