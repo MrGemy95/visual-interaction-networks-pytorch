@@ -5,13 +5,13 @@ An implementation of Deepmind visual interaction networks in Pytorch.
 
 <div align="center">
 
-<img align="center" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/1.gif?raw=true">
+<img align="center" hight="600" width="600" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/1.gif?raw=true">
 </div>
 
 
 ## Architecture
 <div align="center">
-<img hight="800" width="800" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
+<img hight="600" width="600" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
 </div>
 
 
