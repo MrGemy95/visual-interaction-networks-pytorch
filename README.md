@@ -9,12 +9,16 @@ An implementation of Deepmind visual interaction networks in Pytorch.
 </div>
 
 
-## Usage
+## Architecture
+<div align="center">
+<img align="center" src="https://github.com/Mrgemy95/visual-interaction-networks-pytorch/blob/master/figures/2.png?raw=true">
+</div>
 
-### Training monitoring 
 
+### Data
+I used [I@jaesik817](https://github.com/jaesik817/Interaction-networks_tensorflow) physics engine to generate the data.
 
-
+Just run the `physics_engine.py`
 
 
 ### Model Output
